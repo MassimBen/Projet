@@ -1,4 +1,4 @@
-```markdown
+
 ## 🔐 Accès et permissions
 
 ### Prérequis
