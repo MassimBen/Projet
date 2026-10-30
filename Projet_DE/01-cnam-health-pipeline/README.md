@@ -1,4 +1,4 @@
-```markdown
+
 ## 🔐 Accès et permissions
 
 ### Prérequis
@@ -33,8 +33,7 @@
 
 ### Méthode d'authentification : Google SDK (ADC)
 
-> **Choix retenu** : Authentification via Application Default Credentials du Google Cloud SDK. La variable d'environnement `GOOGLE_APPLICATION_CREDENTIALS` pointe vers la clé JSON du compte de service.
-
+> **Choix retenu** : Authentification via Application Default Credentials du Google Cloud SDK.
 ```
 $ gcloud auth application-default login
 ```
