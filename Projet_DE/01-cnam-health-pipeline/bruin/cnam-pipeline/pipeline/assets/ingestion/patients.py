@@ -11,21 +11,21 @@ materialization:
 columns:
   - name: annee
     type: integer
-  - name: patho_niv1
-    type: string
-  - name: patho_niv2
-    type: string
-  - name: patho_niv3
-    type: string
-  - name: top
-    type: string
-  - name: comorbidite
-    type: string
-  - name: libelle_comorbidite
+  - name: profession_sante
     type: string
   - name: region
-    type: integer
-  - name: dept
+    type: string
+  - name: libelle_region
+    type: string
+  - name: departement
+    type: string
+  - name: libelle_departement
+    type: string
+  - name: nombre_patients_medecin_traitant
+    type: string
+  - name: taux_evolution_annuel
+    type: string
+  - name: taux_evolution_annuel_integer
     type: integer
   - name: ncomorb
     type: integer
@@ -45,50 +45,52 @@ columns:
 
 from io import StringIO
 
-import pandas as pd
+import polars as pl
 import requests
 
+# data source: https://data.ameli.fr/explore/dataset/comorbidites/information/
 API_URL = (
     "https://data.ameli.fr/api/explore/v2.1/catalog/datasets/"
     "comorbidites/exports/csv?use_labels=false&delimiter=%3B"
 )
-
+ # columns and their types as expected from the API response
 COLUMN_TYPES = {
-    "annee": "Int64",
-    "patho_niv1": "string",
-    "patho_niv2": "string",
-    "patho_niv3": "string",
-    "top": "string",
-    "comorbidite": "string",
-    "libelle_comorbidite": "string",
-    "region": "Int64",
-    "dept": "Int64",
-    "ncomorb": "Int64",
-    "ntop": "Int64",
-    "proportion_comorb": "Float64",
-    "patho_niv1_comorb": "string",
-    "patho_niv2_comorb": "string",
-    "patho_niv3_comorb": "string",
-    "niveau_prioritaire": "string",
+    "annee": pl.Int64,
+    "patho_niv1": pl.String,
+    "patho_niv2": pl.String,
+    "patho_niv3": pl.String,
+    "top": pl.String,
+    "comorbidite": pl.String,
+    "libelle_comorbidite": pl.String,
+    "region": pl.Int64,
+    "dept": pl.Int64,
+    "ncomorb": pl.Int64,
+    "ntop": pl.Int64,
+    "proportion_comorb": pl.Float64,
+    "patho_niv1_comorb": pl.String,
+    "patho_niv2_comorb": pl.String,
+    "patho_niv3_comorb": pl.String,
+    "niveau_prioritaire": pl.String,
 }
 
-
-def materialize() -> pd.DataFrame:
+# function to fetch and materialize the data from the API
+def materialize_comorbidites() -> pl.DataFrame:
     response = requests.get(API_URL, timeout=(10, 120))
     response.raise_for_status()
-
-    data = pd.read_csv(
+# data is read into a Polars DataFrame with specified column types
+    data = pl.read_csv(
         StringIO(response.text),
-        sep=";",
-        dtype=COLUMN_TYPES,
+        separator=";",
+        dtypes=COLUMN_TYPES,
     )
+    # check for missing columns and raise an error if any are missing
     missing_columns = set(COLUMN_TYPES).difference(data.columns)
     if missing_columns:
         raise ValueError(
             "L'API Comorbidités ne contient pas les colonnes attendues : "
             + ", ".join(sorted(missing_columns))
         )
-    if data.empty:
+    if data.is_empty():
         raise ValueError("L'API Comorbidités a renvoyé un jeu de données vide.")
 
-    return data[list(COLUMN_TYPES)]
+    return data.select(list(COLUMN_TYPES))
