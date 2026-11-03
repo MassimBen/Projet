@@ -1,4 +1,4 @@
-# Pipeline de données CNAM
+# Description du projet — Pipeline de données CNAM
 
 ## Présentation
 
@@ -27,12 +27,15 @@ Les fichiers doivent rester localement dans le dossier d'ingestion :
 
 Ils ne doivent pas être ajoutés au dépôt Git. Les motifs de fichiers de dépenses sont exclus des futurs ajouts par le `.gitignore` à la racine du dossier `Projet`. Cette règle n'enlève toutefois pas du suivi Git des fichiers déjà commités ou déjà suivis par Git LFS.
 
+L'asset `cnam.depenses_2025` charge des lignes agrégées de dépenses de santé. Le périmètre actuel couvre janvier à avril 2025 ; les lignes ne représentent pas des patients individuels. Le détail des variables des dépenses et des deux jeux de données issus des API est décrit dans le [catalogue des données](./catalogue_donnees.md).
+
 ### Comorbidités — asset `cnam.comorbidites`
 
 - Fiche du jeu de données : [Comorbidités associées aux pathologies](https://data.ameli.fr/explore/dataset/comorbidites/information/)
 - API CSV utilisée par [`patients.py`](./bruin/cnam-pipeline/pipeline/assets/ingestion/patients.py) :
   [Exporter les données de comorbidités](https://data.ameli.fr/api/explore/v2.1/catalog/datasets/comorbidites/exports/csv?use_labels=false&delimiter=%3B)
 - Le séparateur fourni par cette API est le point-virgule.
+- Les colonnes et leur signification sont récapitulées dans le [catalogue des données](./catalogue_donnees.md).
 
 ### Patientèle des médecins traitants — asset `cnam.professionelle`
 
@@ -40,6 +43,7 @@ Ils ne doivent pas être ajoutés au dépôt Git. Les motifs de fichiers de dép
 - API CSV utilisée par [`professionelle.py`](./bruin/cnam-pipeline/pipeline/assets/ingestion/professionelle.py) :
   [Exporter les données de patientèle](https://data.ameli.fr/api/explore/v2.1/catalog/datasets/patientele-medecintraitant-generalistes-annuelle/exports/csv?use_labels=false&delimiter=%3B)
 - Le séparateur fourni par cette API est le point-virgule.
+- Les colonnes et leur signification sont récapitulées dans le [catalogue des données](./catalogue_donnees.md).
 
 Ces deux assets interrogent directement leur API lors de l'exécution ; il n'est pas nécessaire de télécharger ces jeux de données à l'avance.
 
@@ -58,7 +62,15 @@ Ces deux assets interrogent directement leur API lors de l'exécution ; il n'est
 
 ### 1. Préparer l'environnement local
 
-- Installer Google Cloud SDK et Bruin CLI.
+- Installer [Bruin CLI](https://getbruin.com/docs/bruin) avec [Git Bash](https://git-scm.com/download/win) sous Windows, en exécutant le script officiel :
+
+  ```bash
+  curl -LsSf https://getbruin.com/install/cli | sh
+  ```
+
+  Ouvrir un nouveau terminal et vérifier l'installation avec `bruin version`. Consulter la [documentation Bruin](https://getbruin.com/docs/bruin) pour les autres environnements.
+- Installer [Terraform](https://developer.hashicorp.com/terraform/install). Sous Windows avec WinGet, exécuter `winget install Hashicorp.Terraform`, puis vérifier l'installation dans un nouveau terminal avec `terraform version`.
+- Installer [Google Cloud CLI](https://cloud.google.com/sdk/docs/install) et initialiser l'authentification locale (voir l'étape 2).
 - Disposer de Python 3.11 pour les assets Python.
 - Depuis le dossier `bruin/cnam-pipeline`, utiliser la configuration du pipeline et les dépendances Python déclarées dans le dossier d'ingestion.
 - Les fichiers locaux de configuration et les journaux d'exécution ne doivent pas contenir ni exposer de secrets.
@@ -67,7 +79,7 @@ Ces deux assets interrogent directement leur API lors de l'exécution ; il n'est
 
 Le projet GCP est `cnam-pipeline`. Le dataset BigQuery est `cnam`, avec une localisation `EU`.
 
-La configuration Terraform du dossier [`terraform/`](./terraform/) déclare le dataset BigQuery. L'authentification locale repose sur les Application Default Credentials du Google Cloud SDK. Configurer l'identité GCP avant l'exécution du pipeline.
+La configuration Terraform du dossier [`terraform/`](./terraform/) déclare le dataset BigQuery. Depuis ce dossier, initialiser Terraform avec `terraform init`, puis examiner les changements avec `terraform plan` avant toute application. L'authentification locale repose sur les Application Default Credentials du Google Cloud SDK : exécuter `gcloud auth application-default login` et configurer le projet avec `gcloud config set project cnam-pipeline` avant l'exécution.
 
 Le compte de service utilisé pour le pipeline doit avoir :
 
