@@ -11,21 +11,21 @@ materialization:
 columns:
   - name: annee
     type: integer
-  - name: profession_sante
+  - name: patho_niv1
+    type: string
+  - name: patho_niv2
+    type: string
+  - name: patho_niv3
+    type: string
+  - name: top
+    type: string
+  - name: comorbidite
+    type: string
+  - name: libelle_comorbidite
     type: string
   - name: region
-    type: string
-  - name: libelle_region
-    type: string
-  - name: departement
-    type: string
-  - name: libelle_departement
-    type: string
-  - name: nombre_patients_medecin_traitant
-    type: string
-  - name: taux_evolution_annuel
-    type: string
-  - name: taux_evolution_annuel_integer
+    type: integer
+  - name: dept
     type: integer
   - name: ncomorb
     type: integer
@@ -74,7 +74,7 @@ COLUMN_TYPES = {
 }
 
 # function to fetch and materialize the data from the API
-def materialize_comorbidites() -> pl.DataFrame:
+def materialize() -> pl.DataFrame:
     response = requests.get(API_URL, timeout=(10, 120))
     response.raise_for_status()
 # data is read into a Polars DataFrame with specified column types

@@ -1,0 +1,6 @@
+
+name: cnam.depenses_2025
+type: bq.seed
+parameters:
+  path: NTOT2025_janvier_avril_seed.csv
+

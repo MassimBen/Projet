@@ -43,17 +43,17 @@ API_URL = (
 
 COLUMN_TYPES = {
     "annee": pl.Int64,
-    "profession_sante": pl.Utf8,
-    "region": pl.Utf8,
-    "libelle_region": pl.Utf8,
-    "departement": pl.Utf8,
-    "libelle_departement": pl.Utf8,
+    "profession_sante": pl.String,
+    "region": pl.String,
+    "libelle_region": pl.String,
+    "departement": pl.String,
+    "libelle_departement": pl.String,
     "nombre_patients_medecin_traitant": pl.Int64,
-    "taux_evolution_annuel": pl.Utf8,
+    "taux_evolution_annuel": pl.String,
     "taux_evolution_annuel_integer": pl.Float64
 }
 
-def materialize_professionelle() -> pl.DataFrame:
+def materialize() -> pl.DataFrame:
     response = requests.get(API_URL, timeout=(10,120))
     response.raise_for_status()
 

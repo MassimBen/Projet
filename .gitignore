@@ -3,3 +3,5 @@ logs/runs
 logs/*.log
 __pycache__/
 *.py[cod]
+/Projet_DE/01-cnam-health-pipeline/bruin/cnam-pipeline/pipeline/assets/ingestion/NTOT2025_*.CSV
+/Projet_DE/01-cnam-health-pipeline/bruin/cnam-pipeline/pipeline/assets/ingestion/NTOT2025_*_seed.csv
